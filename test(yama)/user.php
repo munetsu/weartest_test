@@ -9,6 +9,8 @@
     header('X-FRAME-OPTIONS: SAMEORIGIN');
 
     $user = $_SESSION['compare'];
+    $ageStart = $_POST['ageS'];
+    $ageEnd = $_POST['ageE'];
     // var_dump($user);
 
     // DB接続
@@ -16,7 +18,7 @@
     $users = [];
     foreach($user as $div){
         $user_id = $div['id'];
-        $stmt = $pdo->prepare("SELECT * FROM wear_user WHERE id = $user_id");
+        $stmt = $pdo->prepare("SELECT * FROM wear_user WHERE id = $user_id AND age BETWEEN $ageStart AND $ageEnd");
         $result = $stmt->execute();
         if($result === false){
             queryError($statement);

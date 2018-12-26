@@ -21,7 +21,7 @@
     // ユーザー毎との相関を入れる空配列
     $array = [];
 
-    $stmt = $pdo->prepare("SELECT * FROM wear_user INNER JOIN bland_matrix ON wear_user.bland2 = bland_matrix.bland_name");
+    $stmt = $pdo->prepare("SELECT * FROM wear_user INNER JOIN bland_matrix ON wear_user.bland2 = bland_matrix.bland_name ORDER BY power DESC");
     $result = $stmt->execute();
     if($result === false){
         queryError($statement);
@@ -34,25 +34,34 @@
             // exit();
             // 相関数値を算出
             // casual
-            $casual_int = $con['casual'];
-            $girly_int = $con['girly'];
+            $casual_int = $con['casual']; //X軸と仮定
+            $girly_int = $con['girly']; //Y軸と仮定
 
+            // 直線の距離と角度の両方で検出
             // 2点間の距離を求める
             // 横の差異
             $diff_side = $casual - $casual_int;
-            // 縦の差異
+            // // 縦の差異
             $diff_length = $girly - $girly_int;
-            // 三平方の定理で距離を出す
+            // // 三平方の定理で距離を出す
             $comp = ($diff_side* $diff_side) + ($diff_length * $diff_length);
             $comp = sqrt($comp);
             $comp = round($comp,3); 
-            // var_dump($comp);
-            // exit();
+            // // var_dump($comp);
+            // // exit();
 
-            // 距離が30以内のもののみを配列に追加する
+            // // 距離が30以内のもののみを配列に追加する
             if($comp <= 30){
-                $array_temp = ['id'=>$con['id'], 'compare'=>$comp];
-                array_push($array,$array_temp);    
+                // 角度の算出
+                $katamuki = $girly_int / $casual_int; //m2
+                $katamuki2 = $girly / $casual; //m1
+                $tan = abs(($katamuki2 - $katamuki) / 1+ $katamuki2*$katamuki);
+                // 参考サイト：https://sci-pursuit.com/math/trigonometric-function-table.html
+                // 30度以内でのユーザーを検出
+                if($tan < 0.55431){
+                    $array_temp = ['id' =>$con['id'], 'compare' => $tan];
+                    array_push($array,$array_temp);
+                }                
             }
         }
         // セッションに入れる
@@ -74,6 +83,9 @@
 <body>
     
     <h3>ユーザー検索</h3>
+    <p>年齢</p>
+    <select name="age" id="ageS"></select>
+    <select name="age" id="ageE"></select>
     <button id="btn">検索する</button>
     <div id="describe"></div>
 
