@@ -19,7 +19,7 @@
         $pdo = db_con();
 
         // ログインチェック
-        $sql ="SELECT * FROM bland_matrix";
+        $sql ="SELECT * FROM wear_user";
         $stmt = $pdo->prepare($sql);
         $val = $stmt->execute();
 
@@ -27,11 +27,9 @@
             queryError($stmt);
         } else {
             while($res = $stmt->fetch(PDO::FETCH_ASSOC)){
-                if($res['bland_name'] == $name){
-                    $_SESSION['cid'] = $res['bland_id'];
-                    $_SESSION['name'] = $res['bland_name'];
-                    $_SESSION['casual'] = $res['casual'];
-                    $_SESSION['girly'] = $res['girly'];
+                if($res['name'] == $name){
+                    $_SESSION['uid'] = $res['id'];
+                    $_SESSION['name'] = $res['name'];
                     header('Location: top.php');
                     exit();
                     break;
